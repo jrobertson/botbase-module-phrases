@@ -26,9 +26,9 @@ class BotBaseModulePhrases
 
   end
   
-  def query(sender='user01', said)    
+  def query(sender='user01', said, mode: :voicechat)    
         
-    #puts 'said: ' + said.inspect
+    puts 'inside phrases::query()' + said.inspect
     
     a = @ste.mae message: said
 
