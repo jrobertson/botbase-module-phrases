@@ -26,9 +26,7 @@ class BotBaseModulePhrases
 
   end
   
-  def query(sender='user01', said, mode: :voicechat)    
-        
-    puts 'inside phrases::query()' + said.inspect
+  def query(sender='user01', said, mode: :voicechat)           
     
     a = @ste.mae message: said
 
@@ -44,11 +42,20 @@ class BotBaseModulePhrases
           
           rsc.run_job package, job, {}, args=x, package_path: package_path
         }, 
-        sps: ->(x, rsc){ @sps.notice x },
+        sps: ->(x, rsc) { 
+                         
+          topic, msg = x.split(':',2)
+                        
+          if topic == 'reply' and mode == :voicechat then
+            @sps.notice 'echo: ' + msg
+          end
+       },      
         ste: ->(x, rsc){ @ste.run x }
       }
 
     end
+    
+    r = nil
             
     a.each do |type, x| 
       
@@ -63,7 +70,15 @@ class BotBaseModulePhrases
         
       end # /thread
       
+      if type == :sps and x[/^reply/] and mode != :voicechat then
+
+        r = x[/:\s*(.*)/,1].to_s
+
+      end
+      
     end # /each           
+    
+    return r
     
   end
   

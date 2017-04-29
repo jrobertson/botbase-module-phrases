@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = 'botbase-module-phrases'
-  s.version = '0.1.1'
+  s.version = '0.1.2'
   s.summary = 'A botbase module for matching a speech keyword which then ' + 
       'triggers a general RSC job or publishes an SPS message etc.'
   s.authors = ['James Robertson']
