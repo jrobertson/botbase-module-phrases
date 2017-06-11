@@ -14,7 +14,8 @@ require 'spstrigger_execute'
 class BotBaseModulePhrases
   
   def initialize(host: nil, package_src: nil, reg: nil, keywords: '', 
-                 px_url: nil, sps_host: 'sps', sps_port: '59000', logfile: nil)
+                 px_url: nil, sps_host: 'sps', sps_port: '59000', 
+                 logfile: nil, voiceassistant: 'emma')
 
     @rsc = RSC.new host, package_src
      
@@ -23,12 +24,13 @@ class BotBaseModulePhrases
     @ste = SPSTriggerExecute.new keywords, reg=nil, px=nil, logfile: logfile
     @keywords = keywords
     @sps = SPSPub.new host: sps_host, port: sps_port
+    @voiceassistant = voiceassistant
 
   end
   
   def query(sender='user01', said, mode: :voicechat)    
         
-    puts 'inside phrases::query()' + said.inspect
+    #puts 'inside phrases::query()' + said.inspect
     
     a = @ste.mae message: said
 
@@ -48,7 +50,8 @@ class BotBaseModulePhrases
                         
           topic, msg = x.split(':',2)
                         
-          fqm = (topic == 'reply' and mode == :voicechat) ? 'echo: ' + msg : x                       
+          fqm = (topic == 'reply' and mode == :voicechat) ? 
+                       "echo/#{@voiceassistant}: " + msg : x                       
           @sps.notice fqm
        },
         ste: ->(x, rsc){ @ste.run x }
