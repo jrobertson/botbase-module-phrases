@@ -28,7 +28,7 @@ class BotBaseModulePhrases
 
   end
   
-  def query(sender='user01', said, mode: :voicechat)    
+  def query(sender='user01', said, mode: :voicechat, echo_node: 'node1')    
         
     #puts 'inside phrases::query()' + said.inspect
     
@@ -51,7 +51,8 @@ class BotBaseModulePhrases
           topic, msg = x.split(':',2)
                         
           fqm = (topic == 'reply' and mode == :voicechat) ? 
-                       "echo/#{@voiceassistant}: " + msg : x                       
+                       echo_node + "/echo/#{@voiceassistant}: " + msg : x
+
           @sps.notice fqm
        },
         ste: ->(x, rsc){ @ste.run x }
