@@ -17,13 +17,14 @@ class BotBaseModulePhrases
               px_url: nil, logfile: nil, voiceassistant: 'emma', callback: nil)
 
     @rsc = RSC.new host, package_src
-     
+    
+    # px may be use in future for advanced rules which use conditionals
     #px = Polyrex.new px_url
+    
+    @keywords, @voiceassistant, @bot = keywords, voiceassistant, callback
+    botlog = @bot.log ? @bot.log : nil
 
-    @ste = SPSTriggerExecute.new keywords, reg=nil, px=nil, logfile: logfile
-    @keywords = keywords
-    @bot = callback
-    @voiceassistant = voiceassistant
+    @ste = SPSTriggerExecute.new keywords, reg=nil, px=nil, log: botlog
 
   end
   
@@ -66,11 +67,22 @@ class BotBaseModulePhrases
       
       Thread.new do
         
+        if @bot.log then
+          
+          instruction = x.length > 60 ? x[0..57] + '...' : x
+          @bot.log.info "BotBaseModulePhrases/query: matched type: %," + 
+              " instruction: %s in response to %s" % [type, instruction, said]
+          
+        end
+        
         begin
           h[type].call x, @rsc
         rescue
-          warning =  'botbase-module-phrases warning: ' + ($!).inspect
-          puts warning
+
+          if @bot.log then
+            @bot.log.debug 'BotBaseModulePhrases/query/error: ' + ($!).inspect
+          end
+
         end
         
       end # /thread
