@@ -13,10 +13,10 @@ require 'spstrigger_execute'
 
 class BotBaseModulePhrases
   
-  def initialize(host: nil, package_src: nil, reg: nil, keywords: '', 
-              px_url: nil, logfile: nil, voiceassistant: 'emma', callback: nil)
+  def initialize(host: nil, reg: nil, keywords: '', 
+              px_url: nil, voiceassistant: 'emma', callback: nil)
 
-    @rsc = RSC.new host, package_src
+    @rsc = RSC.new host
     
     # px may be use in future for advanced rules which use conditionals
     #px = Polyrex.new px_url
