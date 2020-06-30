@@ -46,6 +46,11 @@ class BotBaseModulePhrases
           
           rsc.run_job package, job, {}, args=x, package_path: package_path
         }, 
+        rse_uri: ->(x, rsc){
+        
+          Rse.call x          
+          
+        },         
         sps: ->(x, rsc){
                         
           topic, msg = x.split(':',2)
@@ -63,39 +68,41 @@ class BotBaseModulePhrases
     
     r = nil
             
-    a.each do |type, x| 
+    a2 = a.map do |type, x| 
       
-      Thread.new do
         
+      if @bot.log then
+        
+        instruction = x.length > 60 ? x[0..57] + '...' : x
+        @bot.log.info "BotBaseModulePhrases/query: matched type: %," + 
+            " instruction: %s in response to %s" % [type, instruction, said]
+        
+      end
+      
+      begin
+        r = h[type].call x, @rsc
+      rescue
+
         if @bot.log then
-          
-          instruction = x.length > 60 ? x[0..57] + '...' : x
-          @bot.log.info "BotBaseModulePhrases/query: matched type: %," + 
-              " instruction: %s in response to %s" % [type, instruction, said]
-          
+          @bot.log.debug 'BotBaseModulePhrases/query/error: ' + ($!).inspect
         end
-        
-        begin
-          h[type].call x, @rsc
-        rescue
 
-          if @bot.log then
-            @bot.log.debug 'BotBaseModulePhrases/query/error: ' + ($!).inspect
-          end
-
-        end
-        
-      end # /thread
+      end
+      
       
       if type == :sps and x[/^reply/] and mode != :voicechat then
 
         r = x[/:\s*(.*)/,1].to_s
+        
+      else
+        
+        r
 
       end
       
     end # /each           
     
-    return r      
+    return a2.join(' ')      
     
   end
   
