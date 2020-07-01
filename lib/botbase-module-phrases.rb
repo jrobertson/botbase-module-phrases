@@ -14,9 +14,9 @@ require 'spstrigger_execute'
 class BotBaseModulePhrases
   
   def initialize(host: nil, reg: nil, keywords: '', 
-              px_url: nil, voiceassistant: 'emma', callback: nil)
+              px_url: nil, voiceassistant: 'emma', callback: nil, debug: false)
 
-    @rsc = RSC.new host
+    @rsc, @debug = RSC.new(host), debug
     
     # px may be use in future for advanced rules which use conditionals
     #px = Polyrex.new px_url
@@ -63,14 +63,12 @@ class BotBaseModulePhrases
         ste: ->(x, rsc){ @ste.run x }
       }
 
-    end
-            
+    end            
     
     r = nil
             
     a2 = a.map do |type, x| 
-      
-        
+              
       if @bot.log then
         
         instruction = x.length > 60 ? x[0..57] + '...' : x
@@ -80,7 +78,14 @@ class BotBaseModulePhrases
       end
       
       begin
-        r = h[type].call x, @rsc
+        
+        r, chan, prefix = h[type].call x, @rsc
+        
+        if chan then
+          @bot.channel_lock = chan
+          @bot.message_prefix = prefix
+        end
+        
       rescue
 
         if @bot.log then
